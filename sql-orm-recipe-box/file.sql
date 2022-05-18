@@ -1,0 +1,1 @@
+CREATE USER sequelize_recipe_box_app CREATEDB PASSWORD 'HfKfK79k' SUPERUSER;

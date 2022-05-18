@@ -34,6 +34,9 @@ async function getTenNewestRecipes() {
   // });
   //
   // Docs: https://sequelize.org/master/class/lib/model.js~Model.html#static-method-findAll
+  return await Recipe.findAll({
+    limit: 10
+  });
 }
 
 async function getRecipeById(id) {
@@ -54,6 +57,15 @@ async function getRecipeById(id) {
   //     }
   //   ]
   // });
+  return await Recipe.findByPk(id, {
+    include: [
+      Instruction,
+      {
+        model: Ingredient,
+        include: [MeasurementUnit]
+      }
+    ]
+  });
   //
   // Look at the data model in the instructions to see the relations between the
   // Recipe table and the Ingredients and Instructions table. Figure out which
@@ -79,6 +91,8 @@ async function deleteRecipe(id) {
   // saw in the video.
   //
   // Docs: https://sequelize.org/master/class/lib/model.js~Model.html#instance-method-destroy
+  const found = await Recipe.findByPk(id);
+  await found.destroy()
 }
 
 async function createNewRecipe(title) {
@@ -86,6 +100,7 @@ async function createNewRecipe(title) {
   // return it.
   //
   // Docs: https://sequelize.org/v5/manual/instances.html#creating-persistent-instances
+  return await Recipe.create({title: title});
 }
 
 async function searchRecipes(term) {
@@ -93,6 +108,9 @@ async function searchRecipes(term) {
   // given term in its title
   //
   // Docs: https://sequelize.org/v5/manual/querying.html
+  return await Recipe.findAll({
+    where: Recipe.title, ilike: term
+  })
 }
 
 
