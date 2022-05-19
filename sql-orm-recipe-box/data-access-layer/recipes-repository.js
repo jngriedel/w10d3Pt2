@@ -21,6 +21,9 @@ try {
 
 
 async function getTenNewestRecipes() {
+  return await Recipe.findAll({
+    limit: 10
+  });
   // Use the findAll method of the Recipe object to return the recipes.
   // Use the options for findAll to **limit** the number of objects and order it
   //   appropriately. (That's a hint. Look through that documentation for that
@@ -34,12 +37,18 @@ async function getTenNewestRecipes() {
   // });
   //
   // Docs: https://sequelize.org/master/class/lib/model.js~Model.html#static-method-findAll
-  return await Recipe.findAll({
-    limit: 10
-  });
 }
 
 async function getRecipeById(id) {
+  return await Recipe.findByPk(id, {
+    include: [
+      Instruction,
+      {
+        model: Ingredient,
+        include: [MeasurementUnit]
+      }
+    ]
+  });
   // Use the findByPk method of the Recipe object to return the recipe. Use
   // nested eager loading to load the associated instructions, ingredients, and
   // measurement units.
@@ -57,15 +66,6 @@ async function getRecipeById(id) {
   //     }
   //   ]
   // });
-  return await Recipe.findByPk(id, {
-    include: [
-      Instruction,
-      {
-        model: Ingredient,
-        include: [MeasurementUnit]
-      }
-    ]
-  });
   //
   // Look at the data model in the instructions to see the relations between the
   // Recipe table and the Ingredients and Instructions table. Figure out which
@@ -109,8 +109,12 @@ async function searchRecipes(term) {
   //
   // Docs: https://sequelize.org/v5/manual/querying.html
   return await Recipe.findAll({
-    where: Recipe.title, ilike: term
-  })
+    where: {
+        title: {
+            [Op.iLike]: `%${term}%`,
+        },
+    },
+});
 }
 
 
